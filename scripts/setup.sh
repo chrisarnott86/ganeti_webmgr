@@ -320,7 +320,7 @@ echo "------------------------------------------------------------------------"
 # WARNING: watch out for double slashes when concatenating these strings!
 url="$base_url/$os/$os_codename/$architecture/"
 
-${sudo} ${pip} install $pip_proxy --upgrade --use-wheel --trusted-host ftp.osuosl.org --find-link="$url" "$gwm_location"
+${sudo} ${pip} install $pip_proxy --upgrade --trusted-host ftp.osuosl.org --find-link="$url" "$gwm_location"
 
 if [ ! $? -eq 0 ]; then
     echo "${txtboldred}Something went wrong. Could not install GWM nor its" \
@@ -336,10 +336,10 @@ fi
 if [ "$database_server" != "sqlite" ]; then
     case $database_server in
         postgresql)
-            ${sudo} ${pip} install $pip_proxy --upgrade --use-wheel --trusted-host ftp.osuosl.org --find-link="$url" psycopg2
+            ${sudo} ${pip} install $pip_proxy --upgrade --trusted-host ftp.osuosl.org --find-link="$url" psycopg2
             ;;
         mysql)
-            ${sudo} ${pip} install $pip_proxy --upgrade --use-wheel --trusted-host ftp.osuosl.org --find-link="$url" MySQL-python
+            ${sudo} ${pip} install $pip_proxy --upgrade --trusted-host ftp.osuosl.org --find-link="$url" MySQL-python
             ;;
     esac
 
