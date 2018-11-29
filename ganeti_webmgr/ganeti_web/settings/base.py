@@ -24,7 +24,7 @@ Most of this should be left alone and unchanged.
 from os import makedirs
 from os.path import exists, join
 from .helpers import (
-    app_root, CONFIG_PATH, DEFAULT_INSTALL_PATH,
+    app_root, CONFIG_PATH, DEFAULT_INSTALL_PATH, PROJECT_ROOT,
     generate_secret, ugettext
 )
 
@@ -93,6 +93,7 @@ STATIC_URL = '/static'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
 )
 
 STATICFILES_DIRS = (
@@ -101,6 +102,8 @@ STATICFILES_DIRS = (
 
 STATIC_ROOT = join(DEFAULT_INSTALL_PATH, "collected_static")
 # -- End Static Files Configuration -----
+
+BOWER_COMPONENTS_ROOT = join(PROJECT_ROOT, 'ganeti_webmgr', 'bower_components')
 
 # -- Other Configuration ----------------
 AUTHENTICATION_BACKENDS = (
@@ -163,6 +166,7 @@ INSTALLED_APPS = (
     'ganeti_webmgr.muddle',
     'ganeti_webmgr.muddle.shots',
     'ganeti_webmgr.muddle_users',
+    'djangobower',
 
     # ganeti apps
     'ganeti_webmgr.authentication',
@@ -173,6 +177,17 @@ INSTALLED_APPS = (
     'ganeti_webmgr.virtualmachines',
     'ganeti_webmgr.vm_templates',
     'ganeti_webmgr.ganetiviz',
+)
+
+# Currently contains only the apps that are being stored as minimized
+#   Bower only has access to jquery-ui 1.8.23 in the 1.8 branch
+#   This version of jquery-ui requires jquery 1.8.3+1
+BOWER_INSTALLED_APPS = (
+    'cytoscape',
+    'jquery#1.8.3+1',
+    'jquery-ui#1.8.23',
+    'qTip#1.0.0-rc3',
+    'tablesorter',
 )
 
 ROOT_URLCONF = 'ganeti_webmgr.ganeti_web.urls'
@@ -195,7 +210,7 @@ LANGUAGES = (
 LAZY_CACHE_REFRESH = 600000
 # Other GWM Stuff
 VNC_PROXY = 'localhost:8888'
-RAPI_CONNECT_TIMEOUT = 3
+RAPI_CONNECT_TIMEOUT = 10
 
 
 def create_secrets(folder='.secrets'):
@@ -238,6 +253,8 @@ def create_secrets(folder='.secrets'):
             with open(api_key_file, "r") as f:
                 WEB_MGR_API_KEY = f.read().strip()
 
+        return SECRET_KEY, WEB_MGR_API_KEY
+
     except (IOError, OSError):
         action = 'create' if secret_key_file_exists else 'open'
         msg = ("Unable to %s file at %s. Please either create the file and "
@@ -245,4 +262,6 @@ def create_secrets(folder='.secrets'):
                "set the SECRET_KEY setting in %s.")
         print msg % (action, secret_key_file, CONFIG_PATH)
 
-create_secrets()
+secrets = create_secrets()
+if secrets:
+    SECRET_KEY, WEB_MGR_API_KEY = secrets

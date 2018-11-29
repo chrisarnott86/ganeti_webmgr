@@ -17,9 +17,9 @@
 # 4. installs newest ``pip`` and ``setuptools`` in that virtual environment
 #    (they're needed for ``wheel`` packages below)
 #
-# 5. installs GWM dependencies into that virtual environment (all of them will
-#    be provided as ``wheel`` binary packages, because GWM users might not be
-#    allowed to have ``gcc`` & co. installed)
+# 5. installs GWM dependencies into that virtual environment. (On Centos and
+#    Debian, all of them will be provided as ``wheel`` binary packages, because
+#    GWM users might not be allowed to have ``gcc`` & co. installed)
 #
 # 6. installs GWM itself into that virtual environment
 #
@@ -51,16 +51,18 @@ check_if_exists() {
     fi
 }
 
+version="0.11.2" # current version of GWM
+
 # default values
 install_directory='/opt/ganeti_webmgr'
 config_dir='/opt/ganeti_webmgr/config'
-base_url="http://ftp.osuosl.org/pub/osl/ganeti-webmgr"
+base_url="http://ftp.osuosl.org/pub/osl/ganeti-webmgr/$version"
 script_location=$(dirname $0)
 gwm_location="$script_location/.."
 
 # helper function: display help message
 usage() {
-echo "Install (or upgrade) fresh Ganeti Web Manager from ganeti_webmgrSUOSL servers.
+echo "Install (or upgrade) Ganeti Web Manager from OSUOSL servers.
 
 Usage:
     $0 -h
@@ -200,7 +202,6 @@ if [ $no_dependencies -eq 0 ]; then
             package_manager_cmds='install -y'
             check_if_exists "/usr/bin/$package_manager"
             ;;
-
         unknown)
             # unknown Linux distribution
             echo "${txtboldred}Unknown distribution! Cannot install required" \
@@ -242,8 +243,8 @@ if [ $no_dependencies -eq 0 ]; then
         database_requirements='mysql-libs'
     fi
 
-    ${sudo} ${package_manager} ${package_manager_cmds} python \
-        python-virtualenv ${database_requirements}
+    ${sudo} ${package_manager} ${package_manager_cmds} \
+        python python-virtualenv python-pip ${database_requirements}
 
     # check whether installation succeeded
     if [ ! $? -eq 0 ]; then
@@ -273,7 +274,7 @@ check_if_exists "$venv"
 if [ $upgrade -eq 0 ]; then
     echo "Installing to: $install_directory"
 
-    ${venv} --setuptools --no-site-packages "$install_directory"
+    ${sudo} ${venv} --setuptools --no-site-packages "$install_directory"
     # check if virtualenv has succeeded
     if [ ! $? -eq 0 ]; then
         echo "${txtboldred}Something went wrong. Could not create virtual" \
@@ -296,7 +297,7 @@ fi
 ### updating pip and setuptools to the newest versions, installing wheel
 pip="$install_directory/bin/pip"
 check_if_exists "$pip"
-${pip} install $pip_proxy --upgrade setuptools pip wheel
+${sudo} ${pip} install $pip_proxy --upgrade setuptools pip wheel
 echo
 
 # check if successfully upgraded pip and setuptools
@@ -319,7 +320,7 @@ echo "------------------------------------------------------------------------"
 # WARNING: watch out for double slashes when concatenating these strings!
 url="$base_url/$os/$os_codename/$architecture/"
 
-${pip} install $pip_proxy --upgrade --use-wheel --find-link="$url" "$gwm_location"
+${sudo} ${pip} install $pip_proxy --upgrade --use-wheel --trusted-host ftp.osuosl.org --find-link="$url" "$gwm_location"
 
 if [ ! $? -eq 0 ]; then
     echo "${txtboldred}Something went wrong. Could not install GWM nor its" \
@@ -335,10 +336,10 @@ fi
 if [ "$database_server" != "sqlite" ]; then
     case $database_server in
         postgresql)
-            ${pip} install $pip_proxy --upgrade --use-wheel --find-link="$url" psycopg2
+            ${sudo} ${pip} install $pip_proxy --upgrade --use-wheel --trusted-host ftp.osuosl.org --find-link="$url" psycopg2
             ;;
         mysql)
-            ${pip} install $pip_proxy --upgrade --use-wheel --find-link="$url" MySQL-python
+            ${sudo} ${pip} install $pip_proxy --upgrade --use-wheel --trusted-host ftp.osuosl.org --find-link="$url" MySQL-python
             ;;
     esac
 
@@ -364,11 +365,10 @@ if [ -d "$config_dir" ]; then
     echo "Config directory at $config_dir already exists, not creating it."
 else
     echo "Config directory at $config_dir doesn't exist. Creating it."
-    mkdir -p "$config_dir"
+    ${sudo} mkdir -p "$config_dir"
 
     if [ ! $? -eq 0 ]; then
         echo "Unable to make default config directory at "
         echo "$config_dir${textreset}"
     fi
 fi
-

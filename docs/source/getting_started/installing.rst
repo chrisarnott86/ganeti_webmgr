@@ -21,7 +21,8 @@ operating system, installs required dependencies (even for your database of
 choice!), creates Python virtual environment and finally installs |gwm| with its
 own dependencies.
 
-#. Make sure that all |gwm|'s :ref:`requirements` are met.
+#. Make sure that all |gwm|'s :ref:`requirements` are met. For non-CentOS and
+   non-Debian machines, make sure to see :ref:`other_platforms`.
 
 #. Next you need the latest release of |gwm| which is |release|. You can
    download that here: |release_tarball|. You can also clone the repo and
@@ -61,6 +62,11 @@ own dependencies.
   .. Note:: You will likely need to run this as root as it requires permissions
           to install packages and create directories in ``/opt``.
 
+  .. Warning:: For CentOS 6, the `EPEL repository`_ must be installed to use
+          ``python-virtualenv``. If you do not want to install EPEL, manually
+          install ``python-virtualenv`` and pass the ``-N`` flag to ``setup.sh``.
+
+.. _EPEL repository: https://fedoraproject.org/wiki/EPEL
 .. _vncauthproxy-script:
 
 VNC AuthProxy startup script
@@ -157,6 +163,17 @@ or if you prefer, each time you run ``django-admin.py`` you can provided the
 
 .. Note:: Replace $CMD with the command you actually need to run. Also note that
           the ``--settings`` flag must come after the $CMD being run.
+
+Install Javascript dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ganeti Web Manager uses ``bower`` to manage its dependencies. This allows them
+to be easily ugpraded, as well as not requiring keeping them inside the
+repository. To install the dependencies, use ``django-admin``'s bower command::
+
+    $ django-admin.py bower install
+
+The dependencies might take a minute to download and install.
 
 Initialize database
 ~~~~~~~~~~~~~~~~~~~

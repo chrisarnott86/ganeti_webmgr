@@ -12,11 +12,11 @@ For information on our release cycle and versions, please see :ref:`release_cycl
 Issue Tracking
 --------------
 
-The bug tracker for |gwm| is at `code.osuosl.org`_, and all bugs and feature requests for |gwm| should be tracked there. Please create an issue for any code, documentation or translation you wish to contribute.
+The bug tracker for |gwm| is on `Github`_, and all bugs and feature requests for |gwm| should be tracked there. Please create an issue for any code, documentation or translation you wish to contribute.
 
 Please see :ref:`issues` for details on how to create informative issues.
 
-.. _`code.osuosl.org`: https://code.osuosl.org/projects/ganeti-webmgr
+.. _`Github`: https://github.com/osuosl/ganeti_webmgr/issues
 
 
 Dev Environment
@@ -250,6 +250,18 @@ Submitting Code
 ---------------
 
 Please read :ref:`process` for details on how we triage, review and merge contributed code.
+
+`Bower`_ is used to manage javascript dependencies that have previously
+been stored within GWM as minimized files. For more information on
+``django-bower``, check out their `docs`_.
+
+To update or add Javascript dependencies, add them to ``base.py`` and run
+``manage.py bower install``. This will install the new or updated dependencies
+to ``ganeti_webmgr/bower_components``. Include the added dependencies with the
+pull request.
+
+.. _`Bower`: http://bower.io/
+.. _`docs`: https://django-bower.readthedocs.org/en/latest/
 
 Patches
 '''''''
