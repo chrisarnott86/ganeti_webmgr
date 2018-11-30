@@ -144,7 +144,7 @@ class CachedClusterObject(models.Model):
                 # no info retrieved, use current mtime
                 mtime = self.mtime
 
-            if self.id and (self.mtime is None or mtime > self.mtime):
+            if self.id and (self.mtime is None or mtime is None or mtime > self.mtime):
                 # there was an update. Set info and save the object
                 self.info = info_
                 self.save()
